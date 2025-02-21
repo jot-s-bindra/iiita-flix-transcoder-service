@@ -1,10 +1,21 @@
-// config/kafkaClient.js
-const { Kafka } = require('kafkajs')
-require('dotenv').config()
+// kafka/kafkaProducer.js
+const kafka = require('../config/kafkaClient');
 
-const kafka = new Kafka({
-  clientId: 'iiita-flix-transcoder-service',
-  brokers: [process.env.KAFKA_BROKER || '192.168.43.179:9092']
-})
+const producer = kafka.producer();
 
-module.exports = kafka
+async function sendKafkaEvent(topic, message) {
+    try {
+        await producer.connect();
+        await producer.send({
+            topic,
+            messages: [{ value: JSON.stringify(message) }]
+        });
+        console.log(`✅ Kafka Event Produced - Topic: ${topic}`);
+    } catch (error) {
+        console.error('❌ Kafka Producer Error:', error);
+    } finally {
+        await producer.disconnect();
+    }
+}
+
+module.exports = { sendKafkaEvent };
