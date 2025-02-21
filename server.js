@@ -13,6 +13,18 @@ app.use(express.json())
 
 // ✅ Routes
 app.use('/', testRoute)
+app.post('/api/transcode-status', (req, res) => {
+  const { userId, title, status } = req.body
+
+  if (!userId || !title || !status) {
+    return res.status(400).json({ error: 'Missing required fields' })
+  }
+
+  console.log(`📡 Received Transcode Status: ${status}`)
+  console.log(`👤 User: ${userId}, 🎬 Title: ${title}`)
+
+  res.json({ message: 'Transcode status received successfully' })
+})
 
 // ✅ Start Kafka Consumer If Enabled
 if (process.env.RUN_KAFKA_CONSUMER === 'true') {
